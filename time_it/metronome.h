@@ -1,4 +1,5 @@
 // Radio station WWV uses a 5 ms long pulse of 1000 Hz (i.e. 5 cycles) to make the sound of a "tick"
+// For more efficient output, use PWM pins with analogWriteFrequency() iso tone()
 class Metronome
 {
 private:
@@ -10,10 +11,10 @@ private:
   uint32_t dotted_interval = 0;
   uint32_t next_click = 0;
 
-  uint16_t accent_beat = 2600; // Hz
-  uint16_t normal_beat = accent_beat / 2; // Hz
+  uint16_t accent_click = 2600; // Hz
+  uint16_t normal_click = accent_click / 2; // Hz
   uint8_t time_signature = 4; // = 4/4; 3 = 3/4
-  uint16_t sig[4] = {accent_beat, normal_beat, normal_beat, normal_beat};
+  uint16_t sig[4] = {accent_click, normal_click, normal_click, normal_click};
   uint8_t idx = 0;
 
 public:
@@ -63,9 +64,9 @@ public:
         tone(TICK_PIN, sig[idx++], 5);
         if( idx == ksig ) { idx = 0; }
         //*/
-        // if( idx == 0 ) { tone(cTICK_PIN, accent_beat, 5); next_click = now + dotted_interval;} // For irregular time signatures, TODO: 3/4 == 7/8
-        if( idx == 0 ) { tone(cTICK_PIN, accent_beat, 5); }
-        else           { tone(cTICK_PIN, normal_beat, 5); }
+        // if( idx == 0 ) { tone(cTICK_PIN, accent_click, 5); next_click = now + dotted_interval;} // For irregular time signatures, TODO: 3/4 == 7/8
+        if( idx == 0 ) { tone(cTICK_PIN, accent_click, 5); }
+        else           { tone(cTICK_PIN, normal_click, 5); }
         idx++;
         if( idx == time_signature ) { idx = 0; }
         //*/

@@ -5,29 +5,13 @@
 
 Metronome metronome = Metronome(TICK_PIN);
 
-Tabata tabata = Tabata(8, 3);
+Tabata tabata = Tabata(8, 5, TICK_PIN);
 //Tabata tabata = Tabata();
 
 uint32_t begin_time;
 
 void setup()
 {
-/*  
-  pinMode(TICK_PIN, OUTPUT);
-  for(int i = 0; i < 50; i++)
-  {
-    // for a tick-tock sound
-    // For more efficient output, use PWM pins with analogWriteFrequency().
-    tone(TICK_PIN, 2600, 5);
-    delay(500);
-    tone(TICK_PIN, 1300, 5);
-    delay(500);
-    tone(TICK_PIN, 1300, 5);
-    delay(500);
-    tone(TICK_PIN, 1300, 5);
-    delay(500);    
-  }
-//*/
 	delay(2000);
   Serial.begin(115200); // Debug via USB-Serial (Teensy's programming interface, where 250000 is maximum speed)
   Serial.println();
@@ -35,28 +19,28 @@ void setup()
 
   //tabata.setPracticeTime(20);
   //tabata.setRestTime(10);
-  //tabata.start();
+  tabata.start();
 
-  metronome.setBPM(60);
-  //metronome.decBPM(20);
-  metronome.start();
+  //metronome.setBPM(60);
+  ////metronome.decBPM(20);
+  //metronome.start();
   begin_time = millis();
 }
   
 void loop()
 {
-/*
+//*
   tabata.update();
   delay(100);
 
   if( tabata.isRunning() )
   {
-    if( millis() - begin_time > 22000 )
+    if( millis() - begin_time > 26000 )
     {
       tabata.stop();
     }
   }
-//*/
+/*/
   metronome.update();
   delay(100);
 
@@ -72,5 +56,5 @@ void loop()
       metronome.stop();
     }
   }
-//*
+//*/
 }

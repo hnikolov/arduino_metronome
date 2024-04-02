@@ -1,20 +1,24 @@
 class Tabata
 {
 private:
+  uint8_t cTICK_PIN;
+  uint16_t accent_click = 2600; // Hz
+  uint16_t normal_click = accent_click / 2; // Hz
+
   uint16_t practice_time;
   uint16_t rest_time;
   uint16_t practice_cnt = 0;
   uint16_t rest_cnt = 0;
   uint16_t second = 0;
-  uint32_t started_at = 0;
   bool running = false;
   enum TbStates {Tb_practice, Tb_rest};
-  TbStates _tbstate = Tb_practice;
+  TbStates _tbstate = Tb_rest;
 
 public:
-  Tabata(uint16_t practice_time=45, uint16_t rest_time=15):
-    practice_time(practice_time * 1000), // ms
-    rest_time(rest_time * 1000) {} // ms
+  Tabata(uint16_t practice_time=45, uint16_t rest_time=15, uint8_t tick_pin=7):
+    cTICK_PIN(tick_pin),
+    practice_time(practice_time), // seconds
+    rest_time(rest_time) {} // seconds
 
   bool isRunning() { return running; }
   bool isPractice() { return _tbstate == Tb_practice; }
@@ -22,30 +26,28 @@ public:
   uint16_t getPracticeCnt() { return practice_cnt; }
   uint16_t getRestCnt() { return rest_cnt; }
 
-  void setPracticeTime( uint16_t seconds ) { practice_time = seconds * 1000;  }
-  void setRestTime( uint16_t seconds )     { rest_time = seconds * 1000;      }
-  void incPracticeTime( uint16_t seconds ) { practice_time += seconds * 1000; }
-  void incRestTime( uint16_t seconds )     { rest_time += seconds * 1000;     }
+  void setPracticeTime( uint16_t seconds ) { practice_time = seconds;  }
+  void setRestTime( uint16_t seconds )     { rest_time = seconds;      }
+  void incPracticeTime( uint16_t seconds ) { practice_time += seconds; }
+  void incRestTime( uint16_t seconds )     { rest_time += seconds;     }
 
   void decPracticeTime( uint16_t seconds )
   {
-    if( practice_time < seconds * 1000 ) { practice_time = 0; }
-    else { practice_time -= seconds * 1000; }
+    if( practice_time < seconds ) { practice_time = 0; }
+    else { practice_time -= seconds; }
   }
   
   void decRestTime( uint16_t seconds )
   {
-    if( rest_time < seconds * 1000 ) { rest_time = 0; }
-    else { rest_time -= seconds * 1000; }
+    if( rest_time < seconds ) { rest_time = 0; }
+    else { rest_time -= seconds; }
   }
 
   void start()
   {
-    _tbstate = Tb_practice;
-    practice_cnt = 0;
-    rest_cnt = rest_time / 1000; // seconds
-    started_at = millis();
-    second = started_at;
+    _tbstate = Tb_rest;
+    rest_cnt = 4; // Ready: 3-2-1 count before start practicing
+    second = millis();
     running = true;
     Serial.println("Tabata start");
   }
@@ -55,7 +57,6 @@ public:
     if( running == true )
     {
       Serial.println("Tabata stopped");
-      _tbstate = Tb_practice;
       running = false;
     }
   }
@@ -75,12 +76,16 @@ public:
             second = now;
             Serial.println("Practice: " + String(practice_cnt));
 
-            if( now - started_at >= practice_time )
+            if( practice_cnt >= practice_time )
             {
-              started_at = millis();
               _tbstate = Tb_rest;
-              rest_cnt = (rest_time-1) / 1000; // seconds
+              rest_cnt = rest_time; // seconds
               Serial.println("Tabata: Rest");
+              tone(cTICK_PIN, normal_click, 5);
+            }
+            else if( practice_cnt >= practice_time - 3 )
+            {
+              tone(cTICK_PIN, accent_click, 5);
             }
           }
         break;
@@ -92,12 +97,16 @@ public:
             rest_cnt--;
             second = now;
           
-            if( now - started_at >= rest_time )
+            if( rest_cnt == 0 )
             {
-              started_at = millis();
               _tbstate = Tb_practice;
               practice_cnt = 0;
               Serial.println("Tabata: Practice");
+              tone(cTICK_PIN, accent_click, 5);
+            }
+            else if( rest_cnt <= 3 ) 
+            {
+              tone(cTICK_PIN, normal_click, 5);
             }
           }
         break;
