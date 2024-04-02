@@ -1,5 +1,3 @@
-// Radio station WWV uses a 5 ms long pulse of 1000 Hz (i.e. 5 cycles) to make the sound of a "tick"
-// For more efficient output, use PWM pins with analogWriteFrequency() iso tone()
 class Metronome
 {
 private:
