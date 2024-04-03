@@ -74,8 +74,8 @@ public:
 
   void decBPM( uint16_t val )
   {
-    if( bpm < val ) { bpm = 0; }
-    else { bpm -= val; }
+    if( bpm < val ) { bpm  = 0;   }
+    else            { bpm -= val; }
     interval = bpm_to_interval();
     Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));
   }
@@ -84,8 +84,8 @@ public:
   {
     // Get button press interval (discarding spurious results from long intervals, i.e. only do stuff on multiple presses)
     tempotaptime0 = tempotaptime1; // Time of last press
-    tempotaptime1 = millis();			 // Time of most recent press
-    if( tempotaptime1 - tempotaptime0 < tempotaptimeout )	// Ignore long intervals > tempotaptimeout
+    tempotaptime1 = millis();      // Time of most recent press
+    if( tempotaptime1 - tempotaptime0 < tempotaptimeout ) // Ignore long intervals > tempotaptimeout
     {
       tempotapint = tempotaptime1 - tempotaptime0; // Time interval between presses
       bpm = 60000 / tempotapint;
