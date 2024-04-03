@@ -12,8 +12,14 @@ private:
   uint16_t accent_click = 2600; // Hz
   uint16_t normal_click = accent_click / 2; // Hz
   uint8_t time_signature = 4; // = 4/4; 3 = 3/4
+  uint8_t max_ts = 9; // = 9/4
   uint16_t sig[4] = {accent_click, normal_click, normal_click, normal_click};
   uint8_t idx = 0;
+
+  uint32_t tempotaptime0 = 0;
+  uint32_t tempotaptime1 = 0;
+  uint32_t tempotapint = 1000;
+  uint32_t tempotaptimeout = 1500; // Check what whould be this value
 
 public:
   Metronome(uint8_t tick_pin):
@@ -26,17 +32,70 @@ public:
     return per_second;
   }
 
-  void setTimeSignature( uint8_t ts) { time_signature = ts; }
-  void setBPM( uint16_t _bpm ) { bpm = _bpm; }
-  uint16_t getBPM() { return bpm; }
-  bool isRunning() { return running; }
-  void stop()
+  void setTimeSignature( uint8_t ts)
   {
-    if( running == true )
+    time_signature = ts;
+    Serial.println("Metronome time signature set to: " + String(time_signature) + "/4");
+  }
+
+  void prevTimeSignature()
+  {
+    time_signature--;
+    if( time_signature < 2 ) { time_signature = max_ts; }
+    Serial.println("Metronome time signature changed to: " + String(time_signature) + "/4");
+  }
+
+  void nextTimeSignature()
+  {
+    time_signature++;
+    if( time_signature > max_ts ) { time_signature = 2; } // 2/4
+    Serial.println("Metronome time signature changed to: " + String(time_signature) + "/4");
+  }
+
+  void setBPM( uint16_t _bpm )
+  {
+    bpm = _bpm;
+    interval = bpm_to_interval();
+    Serial.println("Metronome bpm set to: " + String(bpm) + ", interval: " + String(interval));
+  }
+
+  uint16_t getBPM()
+  {
+    return bpm;
+  }
+
+  void incBPM( uint16_t val )
+  {
+    bpm += val;
+    if( bpm > 300 ) { bpm = 300; }
+    interval = bpm_to_interval();
+    Serial.println("Metronome bpm decreased to: " + String(bpm) + ", interval: " + String(interval));
+  }
+
+  void decBPM( uint16_t val )
+  {
+    if( bpm < val ) { bpm = 0; }
+    else { bpm -= val; }
+    interval = bpm_to_interval();
+    Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));
+  }
+
+  void tapBPM()
+  {
+    // Get button press interval (discarding spurious results from long intervals, i.e. only do stuff on multiple presses)
+    tempotaptime0 = tempotaptime1; // Time of last press
+    tempotaptime1 = millis();			 // Time of most recent press
+    if( tempotaptime1 - tempotaptime0 < tempotaptimeout )	// Ignore long intervals > tempotaptimeout
     {
-      Serial.println("Metronome stopped");
-      running = false;
+      tempotapint = tempotaptime1 - tempotaptime0; // Time interval between presses
+      bpm = 60000 / tempotapint;
+      Serial.println("Metronome bpm set by tapping to: " + String(bpm));
     }
+  }
+
+  bool isRunning()
+  {
+    return running;
   }
 
   void start()
@@ -46,6 +105,21 @@ public:
     started_at = millis();
     next_click = started_at + interval;
     Serial.println("Metronome start, " + String(bpm) + " bpm, interval: " + String(interval));
+  }
+
+  void stop()
+  {
+    if( running == true )
+    {
+      Serial.println("Metronome stopped");
+      running = false;
+    }
+  }
+
+  void toggle()
+  {
+    if( isRunning() ) { stop();  }
+    else              { start(); }
   }
 
   void update()
@@ -70,21 +144,5 @@ public:
         //*/
       }
     }
-  }
-
-  void incBPM( uint16_t val )
-  {
-    bpm += val;
-    if( bpm > 300 ) { bpm = 300; }
-    interval = bpm_to_interval();
-    Serial.println("Metronome change, " + String(bpm) + " bpm, interval: " + String(interval));
-  }
-
-  void decBPM( uint16_t val )
-  {
-    if( bpm < val ) { bpm = 0; }
-    else { bpm -= val; }
-    interval = bpm_to_interval();
-    Serial.println("Metronome change, " + String(bpm) + " bpm, interval: " + String(interval));
   }
 };

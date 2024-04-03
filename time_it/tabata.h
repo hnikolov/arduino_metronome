@@ -20,27 +20,67 @@ public:
     practice_time(practice_time), // seconds
     rest_time(rest_time) {} // seconds
 
-  bool isRunning() { return running; }
-  bool isPractice() { return _tbstate == Tb_practice; }
-  bool isRest() { return _tbstate == Tb_rest; }
-  uint16_t getPracticeCnt() { return practice_cnt; }
-  uint16_t getRestCnt() { return rest_cnt; }
+  bool isPractice()
+  {
+    return _tbstate == Tb_practice;
+  }
 
-  void setPracticeTime( uint16_t seconds ) { practice_time = seconds;  }
-  void setRestTime( uint16_t seconds )     { rest_time = seconds;      }
-  void incPracticeTime( uint16_t seconds ) { practice_time += seconds; }
-  void incRestTime( uint16_t seconds )     { rest_time += seconds;     }
+  bool isRest()
+  {
+    return _tbstate == Tb_rest;
+  }
+
+  uint16_t getPracticeCnt()
+  {
+    return practice_cnt;
+  }
+
+  uint16_t getRestCnt()
+  {
+    return rest_cnt;
+  }
+
+  void setPracticeTime( uint16_t seconds )
+  {
+    practice_time = seconds;
+    Serial.println("Tabata practice_time time set to: " + String(practice_time));
+  }
+
+  void setRestTime( uint16_t seconds )
+  {
+    rest_time = seconds;
+    Serial.println("Tabata rest time set to: " + String(rest_time));
+  }
+
+  void incPracticeTime( uint16_t seconds )
+  {
+    practice_time += seconds;
+    Serial.println("Tabata practice_time time increased to: " + String(practice_time));
+  }
+
+  void incRestTime( uint16_t seconds )
+  {
+    rest_time += seconds;
+    Serial.println("Tabata rest time increased to: " + String(rest_time));
+  }
 
   void decPracticeTime( uint16_t seconds )
   {
-    if( practice_time < seconds ) { practice_time = 0; }
-    else { practice_time -= seconds; }
+    if( practice_time < seconds ) { practice_time = 0;        }
+    else                          { practice_time -= seconds; }
+    Serial.println("Tabata practice time decreased to: " + String(practice_time));
   }
-  
+
   void decRestTime( uint16_t seconds )
   {
-    if( rest_time < seconds ) { rest_time = 0; }
-    else { rest_time -= seconds; }
+    if( rest_time < seconds ) { rest_time = 0;        }
+    else                      { rest_time -= seconds; }
+    Serial.println("Tabata rest time decreased to: " + String(rest_time));
+  }
+
+  bool isRunning()
+  {
+    return running;
   }
 
   void start()
@@ -51,7 +91,7 @@ public:
     running = true;
     Serial.println("Tabata start");
   }
-  
+
   void stop()
   {
     if( running == true )
@@ -59,6 +99,12 @@ public:
       Serial.println("Tabata stopped");
       running = false;
     }
+  }
+
+  void toggle()
+  {
+    if( isRunning() ) { stop();  }
+    else              { start(); }
   }
 
   void update()
