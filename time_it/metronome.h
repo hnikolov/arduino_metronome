@@ -1,3 +1,6 @@
+#ifndef _METRONOME_H_
+#define _METRONOME_H_
+
 class Metronome
 {
 private:
@@ -113,6 +116,7 @@ public:
     {
       Serial.println("Metronome stopped");
       running = false;
+      idx = 0;
     }
   }
 
@@ -146,3 +150,5 @@ public:
     }
   }
 };
+
+#endif // _METRONOME_H_

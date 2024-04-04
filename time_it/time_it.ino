@@ -2,59 +2,107 @@
 
 #include "metronome.h"
 #include "tabata.h"
+#include "tabata_metronome.h"
 
 Metronome metronome = Metronome(TICK_PIN);
 
 Tabata tabata = Tabata(8, 5, TICK_PIN);
 //Tabata tabata = Tabata();
 
+Tabata_Metronome tm = Tabata_Metronome(20, 10, TICK_PIN);
+
 uint32_t begin_time;
+
+void test_metronome()
+{
+  while( 1 )
+  {
+    metronome.update();
+    delay(100);
+
+    if( metronome.isRunning() )
+    {
+      if( millis() - begin_time > 6000 && millis() - begin_time < 6100)
+      {
+        metronome.incBPM(80);
+        metronome.setTimeSignature(3); // 3/4
+      }
+
+      if( millis() - begin_time > 24000 )
+      {
+        metronome.stop();
+        return;
+      }
+    }
+  }
+}
+
+void test_tabata()
+{
+  while( 1 )
+  {
+    tabata.update();
+    delay(100);
+
+    if( tabata.isRunning() )
+    {
+      if( millis() - begin_time > 26000 )
+      {
+        tabata.stop();
+      }
+    }
+  }
+}
+
+void test_tabata_metronome()
+{
+  while( 1 )
+  {
+    tm.update();
+    delay(100);
+
+    if( tm.isRunning() )
+    {
+      if((millis() - begin_time > 26000) && (millis() - begin_time < 26100))
+      {
+        tm.enableMetronome(true);
+      }
+
+      if( millis() - begin_time >= 50000 )
+      {
+        tm.stop();
+        return;
+      }
+    }
+  }
+}
 
 void setup()
 {
 	delay(2000);
-  Serial.begin(115200); // Debug via USB-Serial (Teensy's programming interface, where 250000 is maximum speed)
+  Serial.begin(115200);
   Serial.println();
   Serial.println("Tabata/Metronome");
 
-  //tabata.setPracticeTime(20);
-  //tabata.setRestTime(10);
-  tabata.start();
+  begin_time = millis();
+
+  ////tabata.setPracticeTime(20);
+  ////tabata.setRestTime(10);
+  //tabata.start();
+  //test_tabata();
 
   //metronome.setBPM(60);
   ////metronome.decBPM(20);
   //metronome.start();
-  begin_time = millis();
+  //test_metronome();
+
+  tm.setPracticeTime(8);
+  tm.setRestTime(5);
+  tm.enableMetronome(false);
+  tm.start();
+  test_tabata_metronome();
 }
-  
+
 void loop()
 {
-//*
-  tabata.update();
-  delay(100);
-
-  if( tabata.isRunning() )
-  {
-    if( millis() - begin_time > 26000 )
-    {
-      tabata.stop();
-    }
-  }
-/*/
-  metronome.update();
-  delay(100);
-
-  if( metronome.isRunning() )
-  {
-    if( millis() - begin_time > 6000 && millis() - begin_time < 6100)
-    {
-      metronome.incBPM(80);
-      metronome.setTimeSignature(3); // 3/4
-    }
-    if( millis() - begin_time > 24000 )
-    {
-      metronome.stop();
-    }
-  }
-//*/
 }

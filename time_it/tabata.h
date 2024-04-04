@@ -1,6 +1,10 @@
+#ifndef _TABATA_H_
+#define _TABATA_H_
+
 class Tabata
 {
-private:
+//private:
+public:
   uint8_t cTICK_PIN;
   uint16_t accent_click = 2600; // Hz
   uint16_t normal_click = accent_click / 2; // Hz
@@ -48,7 +52,7 @@ public:
 
   void setRestTime( uint16_t seconds )
   {
-    rest_time = seconds;
+    rest_time = seconds; // Note: Rest time cannot be zero
     Serial.println("Tabata rest time set to: " + String(rest_time));
   }
 
@@ -73,8 +77,8 @@ public:
 
   void decRestTime( uint16_t seconds )
   {
-    if( rest_time < seconds ) { rest_time = 0;        }
-    else                      { rest_time -= seconds; }
+    if( rest_time <= seconds ) { rest_time = 1;        } // Note: Rest time cannot be zero
+    else                       { rest_time -= seconds; }
     Serial.println("Tabata rest time decreased to: " + String(rest_time));
   }
 
@@ -83,7 +87,7 @@ public:
     return running;
   }
 
-  void start()
+  virtual void start()
   {
     _tbstate = Tb_rest;
     rest_cnt = 4; // Ready: 3-2-1 count before start practicing
@@ -92,7 +96,7 @@ public:
     Serial.println("Tabata start");
   }
 
-  void stop()
+  virtual void stop()
   {
     if( running == true )
     {
@@ -107,7 +111,7 @@ public:
     else              { start(); }
   }
 
-  void update()
+  virtual void update()
   // Not using interrupts, so this function must be called very regularly in the Arduino loop() function
   {
     if( running == true )
@@ -163,3 +167,5 @@ public:
     }
   }
 };
+
+#endif // _TABATA_H_
