@@ -92,6 +92,7 @@ public:
     {
       tempotapint = tempotaptime1 - tempotaptime0; // Time interval between presses
       bpm = 60000 / tempotapint;
+      interval = bpm_to_interval();
       Serial.println("Metronome bpm set by tapping to: " + String(bpm));
     }
   }
