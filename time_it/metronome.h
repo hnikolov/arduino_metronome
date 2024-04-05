@@ -7,7 +7,6 @@ private:
   uint8_t cTICK_PIN;
   uint16_t bpm = 100;
   bool running = false;
-  uint32_t started_at = 0;
   uint32_t interval = 0;
   uint32_t dotted_interval = 0;
   uint32_t next_click = 0;
@@ -106,8 +105,7 @@ public:
   {
     running = true;
     interval = bpm_to_interval();
-    started_at = millis();
-    next_click = started_at + interval;
+    next_click = millis() + interval;
     Serial.println("Metronome start, " + String(bpm) + " bpm, interval: " + String(interval));
   }
 
