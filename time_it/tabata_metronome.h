@@ -6,9 +6,10 @@
 
 class Tabata_Metronome: public Tabata
 {
-private:
+//private:
+public:
   Metronome metronome;
-  bool with_metronome = true;
+  bool with_metronome = false;
 
 public:
   Tabata_Metronome(uint16_t practice_time, uint16_t rest_time, uint8_t tick_pin):
@@ -22,6 +23,22 @@ public:
     else                 { Serial.println("Tabata metronome: metronome disabled"); }
   }
 
+  void toggleMetronome()
+  {
+    if( with_metronome == true )
+    {
+      with_metronome = false;
+      metronome.stop();
+      Serial.println("Tabata metronome: metronome disabled");
+    }
+    else
+    {
+      with_metronome = true;
+      metronome.start();
+      Serial.println("Tabata metronome: metronome enabled");
+    }
+  }
+
   virtual void start()
   {
     if( with_metronome == true ) { _start();        }
@@ -31,6 +48,7 @@ public:
   void _start()
   {
     _tbstate = Tb_practice;
+    practice_cnt = 0;
     second = millis();
     running = true;
     metronome.start();

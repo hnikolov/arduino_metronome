@@ -34,16 +34,6 @@ public:
     return _tbstate == Tb_rest;
   }
 
-  uint16_t getPracticeCnt()
-  {
-    return practice_cnt;
-  }
-
-  uint16_t getRestCnt()
-  {
-    return rest_cnt;
-  }
-
   void setPracticeTime( uint16_t seconds )
   {
     practice_time = seconds;
