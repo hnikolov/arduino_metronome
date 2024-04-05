@@ -13,7 +13,7 @@ public:
   uint16_t rest_time;
   uint16_t practice_cnt = 0;
   uint16_t rest_cnt = 0;
-  uint16_t second = 0;
+  uint32_t second = 0;
   bool running = false;
   enum TbStates {Tb_practice, Tb_rest};
   TbStates _tbstate = Tb_rest;
