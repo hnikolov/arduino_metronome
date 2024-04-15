@@ -34,10 +34,15 @@ public:
     return per_second;
   }
 
-  void setTimeSignature( uint8_t ts)
+  void setTimeSignature( uint8_t ts )
   {
     time_signature = ts;
     Serial.println("Metronome time signature set to: " + String(time_signature) + "/4");
+  }
+
+  uint8_t getTimeSignature()
+  {
+    return time_signature;
   }
 
   void prevTimeSignature()
@@ -71,7 +76,7 @@ public:
     bpm += val;
     if( bpm > 300 ) { bpm = 300; }
     interval = bpm_to_interval();
-    Serial.println("Metronome bpm decreased to: " + String(bpm) + ", interval: " + String(interval));
+    Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));
   }
 
   void decBPM( uint16_t val )
@@ -79,7 +84,7 @@ public:
     if( bpm < val ) { bpm  = 0;   }
     else            { bpm -= val; }
     interval = bpm_to_interval();
-    Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));
+    Serial.println("Metronome bpm decreased to: " + String(bpm) + ", interval: " + String(interval));
   }
 
   void tapBPM()

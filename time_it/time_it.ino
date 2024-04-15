@@ -5,11 +5,8 @@
 #include "tabata_metronome.h"
 
 Metronome metronome = Metronome(TICK_PIN);
-
 Tabata tabata = Tabata(8, 5, TICK_PIN);
-//Tabata tabata = Tabata();
-
-Tabata_Metronome tm = Tabata_Metronome(20, 10, TICK_PIN);
+Tabata_Metronome tm = Tabata_Metronome(TICK_PIN);
 
 uint32_t begin_time;
 
@@ -65,10 +62,17 @@ void test_tabata_metronome()
     {
       if((millis() - begin_time > 26000) && (millis() - begin_time < 26100))
       {
-        tm.enableMetronome(true);
+        tm.enableMetronomeInTabata(true);
       }
 
-      if( millis() - begin_time >= 50000 )
+      if((millis() - begin_time >= 50000) && (millis() - begin_time < 50100))
+      {
+        tm.metronome.incBPM(20);
+        tm.toggleTabataMetronomeMode();
+        tm.start();
+      }
+
+      if( millis() - begin_time >= 60000 )
       {
         tm.stop();
         return;
@@ -96,9 +100,11 @@ void setup()
   //metronome.start();
   //test_metronome();
 
-  tm.setPracticeTime(8);
-  tm.setRestTime(5);
-  tm.enableMetronome(false);
+  tm.tabata.setPracticeTime(8);
+  tm.tabata.setRestTime(5);
+  //tm.toggleTabataMetronomeMode(); // Tabata
+  tm.selectMetronomeMode(false);     // Tabata
+  tm.enableMetronomeInTabata(false); // without metronome
   tm.start();
   test_tabata_metronome();
 }
