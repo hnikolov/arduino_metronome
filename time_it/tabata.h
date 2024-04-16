@@ -13,8 +13,8 @@ public:
   uint16_t rest_time;
   uint16_t practice_cnt = 1;
   uint16_t rest_cnt = 1;
-  uint16_t ready_cnt = 1;
-  uint16_t ready_time = 4;
+  uint16_t ready_cnt = 0;
+  uint16_t ready_time = 3;
   uint32_t second = 0;
   bool running = false;
   enum TbStates {Tb_practice, Tb_rest, Tb_ready};
@@ -87,7 +87,7 @@ public:
   void start()
   {
     _tbstate = Tb_ready;
-    ready_cnt = 1;
+    ready_cnt = 0;
     second = millis();
     running = true;
     Serial.println("Tabata start");
@@ -99,6 +99,7 @@ public:
     {
       Serial.println("Tabata stopped");
       _tbstate = Tb_ready;
+      ready_cnt = 0;
       running = false;
     }
   }
@@ -131,7 +132,7 @@ public:
               Serial.println("Tabata: Rest");
               tone(cTICK_PIN, normal_click, 5);
             }
-            else if( practice_cnt >= practice_time - 3 )
+            else if( practice_cnt > practice_time - 3 )
             {
               tone(cTICK_PIN, accent_click, 5);
             }
@@ -152,7 +153,7 @@ public:
               Serial.println("Tabata: Practice");
               tone(cTICK_PIN, accent_click, 5);
             }
-            else if( rest_cnt >= rest_time - 3 )
+            else if( rest_cnt > rest_time - 3 )
             {
               tone(cTICK_PIN, normal_click, 5);
             }
@@ -173,7 +174,7 @@ public:
               Serial.println("Tabata: Practice");
               tone(cTICK_PIN, accent_click, 5);
             }
-            else if( ready_cnt >= ready_time - 3 )
+            else if( ready_cnt > ready_time - 3 )
             {
               tone(cTICK_PIN, normal_click, 5);
             }

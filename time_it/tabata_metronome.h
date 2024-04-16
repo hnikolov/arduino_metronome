@@ -43,16 +43,17 @@ public:
 
   void toggleMetronomeInTabata()
   {
+    // TODO: If metronome is enabled during the ready counting state, the effect is "pause"
     with_metronome = !with_metronome;
     if( with_metronome == true ) { metronome.start(); }
     else                         { metronome.stop();  }
-    Serial.println("Toggled tabata with metronome");
+    Serial.println("Toggled tabata with metronome: " + String(with_metronome));
   }
 
   bool isRunning()
   {
-    if( isMetronome == true )         { return metronome.isRunning(); }
-    else                              { return tabata.isRunning();    }
+    if( isMetronome == true ) { return metronome.isRunning(); }
+    else                      { return tabata.isRunning();    }
   }
 
   void start()
@@ -62,9 +63,9 @@ public:
     else                              { tabata.start();    }
   }
 
-  void _start()
+  inline void _start()
   {
-    tabata._tbstate = tabata.Tb_practice;
+    tabata._tbstate = tabata.Tb_practice; // Skip the Ready state
     tabata.practice_cnt = 1;
     tabata.second = millis();
     tabata.running = true;
@@ -75,8 +76,28 @@ public:
   void stop()
   {
     if( isMetronome == true )         { metronome.stop(); }
+    else if( with_metronome == true ) { _stop();          }
     else                              { tabata.stop();    }
+  }
+
+  inline void _stop()
+  {
+    metronome.stop();
+    tabata.stop();
     Serial.println("Tabata metronome stopped");
+  }
+
+  void toggle()
+  {
+    if( isMetronome == true )         { metronome.toggle(); }
+    else if( with_metronome == true ) { _toggle();          }
+    else                              { tabata.toggle();    }
+  }
+
+  inline void _toggle()
+  {
+    if( isRunning() ) { _stop();  }
+    else              { _start(); }
   }
 
   void update()
@@ -86,7 +107,7 @@ public:
     else                              { tabata.update();    }
   }
 
-  void _update()
+  inline void _update()
   // Not using interrupts, so this function must be called very regularly in the Arduino loop() function
   {
     if( tabata.running == true )
